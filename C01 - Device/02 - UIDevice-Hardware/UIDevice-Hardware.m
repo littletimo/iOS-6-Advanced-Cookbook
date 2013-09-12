@@ -84,7 +84,19 @@
 
 - (NSString *) platform
 {
-    return [self getSysInfoByName:"hw.machine"];
+    int mib[2];
+    size_t len;
+    
+    mib[0] = CTL_HW;
+    mib[1] = HW_MACHINE;
+    sysctl(mib, 2, NULL, &len, NULL, 0);
+    char *answer = malloc(sizeof(char) * len);
+    sysctl(mib, 2, answer, &len, NULL, 0);
+    
+    NSString *results = [NSString stringWithFormat:@"%s", answer];
+    
+    free(answer);
+    return results;
 }
 
 
@@ -177,6 +189,7 @@
     if ([platform hasPrefix:@"iPod2"])              return UIDevice2GiPod;
     if ([platform hasPrefix:@"iPod3"])              return UIDevice3GiPod;
     if ([platform hasPrefix:@"iPod4"])              return UIDevice4GiPod;
+    if ([platform hasPrefix:@"iPod5"])              return UIDevice5GiPod;
 
     // iPad
     if ([platform hasPrefix:@"iPad1"])              return UIDevice1GiPad;
